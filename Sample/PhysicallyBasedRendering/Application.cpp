@@ -162,9 +162,7 @@ std::vector<std::string> Application::CreateTextures(
 std::shared_ptr<sgl::Texture> Application::AddBloom(
 	const std::shared_ptr<sgl::Texture>& texture) const
 {
-	
 	auto brightness = CreateBrightness(texture);
-	
 	auto gaussian_blur = CreateGaussianBlur(brightness);
 	return gaussian_blur;
 	auto merge = MergeDisplayAndGaussianBlur(texture, gaussian_blur);
@@ -205,11 +203,11 @@ std::shared_ptr<sgl::Texture> Application::CreateGaussianBlur(
 	//You can get the size from the texture.
 	auto size = texture->GetSize();
 
-	sgl::Render render = sgl::Render();
+	sgl::Render render;
 
 	// You will need 2 frame And you will need 2 textures -> Organize them in an array
 	std::shared_ptr<sgl::Texture> textures[2];
-	textures[0] = texture;
+	textures[0] = std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT);
 	textures[1] = std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT);
 
 	sgl::Frame frames[2];
@@ -217,6 +215,9 @@ std::shared_ptr<sgl::Texture> Application::CreateGaussianBlur(
 	frames[1].BindAttach(render);
 
 	render.BindStorage(size);
+
+	glViewport(0, 0, size.first, size.second);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	frames[0].BindTexture(*textures[0]);
 	frames[1].BindTexture(*textures[1]);
@@ -228,36 +229,29 @@ std::shared_ptr<sgl::Texture> Application::CreateGaussianBlur(
 
 	bool horizontal = true;
 	bool beginning = true;
-
-
-
-	sgl::TextureManager texture_manager{};
 	
 	for (int it = 0; it < 10; it++) {
-		glClearColor(.2f, 0.f, .2f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		sgl::TextureManager texture_manager;
 
 		program->UniformInt("horizontal", horizontal);
 
-		if (beginning) {
-			texture_manager.AddTexture("Beginning", textures[0]);
-			beginning = false;
-		}
-		texture_manager.AddTexture("Gaussian", textures[1]);
+		frames[horizontal].Bind();
+
+		texture_manager.AddTexture(
+			"Image",
+			(beginning) ? texture : textures[!horizontal]);
 
 		//Set textures
-		quad->SetTextures({ "texture" });
+		quad->SetTextures({ "Image" });
 		//Draw quad
 		quad->Draw(texture_manager);
 
 		//Switch horizontal bool
-		if (horizontal)
+		if (beginning)
 		{
 			beginning = !beginning;
 		}
 		horizontal = !horizontal;
-
-
 	}
 	return textures[0];
 }
