@@ -164,8 +164,9 @@ std::shared_ptr<sgl::Texture> Application::AddBloom(
 {
 	
 	auto brightness = CreateBrightness(texture);
-	return brightness;
+	
 	auto gaussian_blur = CreateGaussianBlur(brightness);
+	return gaussian_blur;
 	auto merge = MergeDisplayAndGaussianBlur(texture, gaussian_blur);
 	return merge;
 }
@@ -221,7 +222,7 @@ std::shared_ptr<sgl::Texture> Application::CreateGaussianBlur(
 	frames[1].BindTexture(*textures[1]);
 
 	//Create the program
-	auto program = sgl::CreateProgram("Gaussian");
+	auto program = sgl::CreateProgram("GaussianBlur");
 	//Create the quad
 	auto quad = CreateQuadMesh(program);
 
