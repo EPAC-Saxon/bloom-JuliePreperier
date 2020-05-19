@@ -64,7 +64,7 @@ namespace sgl {
 	{
 		SetupCamera();
 
-		auto texture = std::make_shared<sgl::Texture>(size_);
+		auto texture = std::make_shared<sgl::Texture>(size_, PixelElementSize::FLOAT);
 		Frame frame{};
 		Render render{};
 
