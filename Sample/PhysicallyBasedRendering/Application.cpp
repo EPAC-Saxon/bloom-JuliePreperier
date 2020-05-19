@@ -229,29 +229,25 @@ std::shared_ptr<sgl::Texture> Application::CreateGaussianBlur(
 	bool horizontal = true;
 	bool beginning = true;
 
-
-
 	sgl::TextureManager texture_manager{};
-	
+
 	for (int it = 0; it < 10; it++) {
 		glClearColor(.2f, 0.f, .2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		program->UniformInt("horizontal", horizontal);
 
-		if (beginning) {
-			texture_manager.AddTexture("Beginning", textures[0]);
-			beginning = false;
-		}
-		texture_manager.AddTexture("Gaussian", textures[1]);
+		texture_manager.AddTexture(
+			"Image",
+			(beginning) ? texture : textures[!horizontal]);
 
 		//Set textures
-		quad->SetTextures({ "texture" });
+		quad->SetTextures({ "Image" });
 		//Draw quad
 		quad->Draw(texture_manager);
 
 		//Switch horizontal bool
-		if (horizontal)
+		if (beginning)
 		{
 			beginning = !beginning;
 		}
