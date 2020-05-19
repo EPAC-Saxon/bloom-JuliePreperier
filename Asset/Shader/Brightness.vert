@@ -8,5 +8,6 @@ out vec2 vert_texcoord;
 
 void main()
 {
+	vert_texcoord = in_texcoord;
 	gl_Position = vec4(in_position, 1.0);
 }
