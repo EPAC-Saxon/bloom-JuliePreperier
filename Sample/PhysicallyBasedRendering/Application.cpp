@@ -201,8 +201,64 @@ std::shared_ptr<sgl::Texture> Application::CreateBrightness(
 std::shared_ptr<sgl::Texture> Application::CreateGaussianBlur(
 	const std::shared_ptr<sgl::Texture>& texture) const
 {
-#pragma message ("You have to complete this code!")
-	return texture;
+	//You can get the size from the texture.
+	auto size = texture->GetSize();
+
+	sgl::Render render = sgl::Render();
+
+	// You will need 2 frame And you will need 2 textures -> Organize them in an array
+	std::shared_ptr<sgl::Texture> textures[2];
+	textures[0] = texture;
+	textures[1] = std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT);
+
+	sgl::Frame frames[2];
+	frames[0].BindAttach(render);
+	frames[1].BindAttach(render);
+
+	render.BindStorage(size);
+
+	frames[0].BindTexture(*textures[0]);
+	frames[1].BindTexture(*textures[1]);
+
+	//Create the program
+	auto program = sgl::CreateProgram("Gaussian");
+	//Create the quad
+	auto quad = CreateQuadMesh(program);
+
+	bool horizontal = true;
+	bool beginning = true;
+
+
+
+	sgl::TextureManager texture_manager{};
+	
+	for (int it = 0; it < 10; it++) {
+		glClearColor(.2f, 0.f, .2f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		program->UniformInt("horizontal", horizontal);
+
+		if (beginning) {
+			texture_manager.AddTexture("Beginning", textures[0]);
+			beginning = false;
+		}
+		texture_manager.AddTexture("Gaussian", textures[1]);
+
+		//Set textures
+		quad->SetTextures({ "texture" });
+		//Draw quad
+		quad->Draw(texture_manager);
+
+		//Switch horizontal bool
+		if (horizontal)
+		{
+			beginning = !beginning;
+		}
+		horizontal = !horizontal;
+
+
+	}
+	return textures[0];
 }
 
 std::shared_ptr<sgl::Texture> Application::MergeDisplayAndGaussianBlur(
