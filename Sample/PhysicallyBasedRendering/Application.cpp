@@ -181,7 +181,7 @@ std::shared_ptr<sgl::Texture> Application::CreateBrightness(
 	//Create a new texture
 	auto tex = std::make_shared<sgl::Texture>(size, sgl::PixelElementSize::FLOAT);
 	//Bind it
-	tex->Bind();
+	frame.BindTexture(*tex);
 	//A texture manager
 	sgl::TextureManager texture_manager{};
 	//Add the texture
