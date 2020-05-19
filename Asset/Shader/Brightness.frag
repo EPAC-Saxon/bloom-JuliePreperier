@@ -8,5 +8,11 @@ uniform sampler2D Display;
 
 void main()
 {
-	frag_color = vec4(1.0, 0.0, 0.0, 1.0);
+	vec4 lighting = texture(Display, vert_texcoord);
+	float brightness = dot(lighting.rgb, vec3(0.2126, 0.7152, 0.0722));
+
+	if (brightness > 1.0)
+		frag_color = vec4(lighting.rgb, 1.0);
+	else
+		frag_color = vec4(0.0, 0.0, 0.0, 1.0);
 }

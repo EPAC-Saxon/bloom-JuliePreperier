@@ -46,13 +46,56 @@ namespace sgl {
 
 	void Device::Display(const std::shared_ptr<Texture>& texture)
 	{
-#pragma message ("You have to complete this code!")
+		auto prog = CreateProgram("Display");
+		auto quad = CreateQuadMesh(prog);
+
+		texture_manager_.AddTexture(
+			"Display",
+			texture);
+		quad->SetTextures({ "Display" });
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		error_.Display(__FILE__, __LINE__ - 1);
+		quad->Draw(texture_manager_);
 	}
 
 	std::shared_ptr<Texture> Device::DrawTexture(const double dt)
 	{
-#pragma message ("You have to complete this code!")
-		return nullptr;
+		// Setup the camera.
+		SetupCamera();
+
+		// Set the view port for rendering.
+		glViewport(0, 0, size_.first, size_.second);
+
+		// Clear the screen.
+		glClearColor(.2f, 0.f, .2f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		auto texture = std::make_shared<sgl::Texture>(size_);
+		Frame frame{};
+		Render render{};
+
+		frame.BindAttach(render);
+		render.BindStorage(size_);
+
+		texture->Bind();
+
+		for (const std::shared_ptr<sgl::Scene>& scene : scene_tree_)
+		{
+			const std::shared_ptr<sgl::Mesh>& mesh = scene->GetLocalMesh();
+			if (!mesh)
+			{
+				continue;
+			}
+
+			// Draw the mesh.
+			mesh->Draw(
+				texture_manager_,
+				perspective_,
+				view_,
+				scene->GetLocalModel(dt));
+		}
+
+		return texture;
 	}
 
 	void Device::SetupCamera()

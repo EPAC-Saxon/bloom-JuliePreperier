@@ -171,8 +171,23 @@ std::shared_ptr<sgl::Texture> Application::AddBloom(
 std::shared_ptr<sgl::Texture> Application::CreateBrightness(
 	const std::shared_ptr<sgl::Texture>& texture) const
 {
-#pragma message ("You have to complete this code!")
-	return texture;
+	auto size = texture->GetSize();
+
+	sgl::Frame frame = sgl::Frame();
+	sgl::Render render = sgl::Render();
+
+	auto tex = std::make_shared<sgl::Texture>(size);
+	tex->Bind();
+
+	sgl::TextureManager texture_manager = sgl::TextureManager();
+	texture_manager.AddTexture("Brightness", texture);
+
+	auto program = sgl::CreateProgram("Brightness");
+	auto quad = CreateQuadMesh(program);
+	quad->SetTextures({ "Brightness" });
+	quad->Draw(texture_manager);
+
+	return tex;
 }
 
 std::shared_ptr<sgl::Texture> Application::CreateGaussianBlur(
