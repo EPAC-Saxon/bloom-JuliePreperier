@@ -48,11 +48,12 @@ namespace sgl {
 	{
 		auto prog = CreateProgram("Display");
 		auto quad = CreateQuadMesh(prog);
-
-		TextureManager texture_manager;
+		
+		TextureManager texture_manager{};
 		texture_manager.AddTexture(
 			"Display",
 			texture);
+
 		quad->SetTextures({ "Display" });
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		error_.Display(__FILE__, __LINE__ - 1);
@@ -61,13 +62,13 @@ namespace sgl {
 
 	std::shared_ptr<Texture> Device::DrawTexture(const double dt)
 	{
-		// Setup the camera.
 		SetupCamera();
 
 		auto texture = std::make_shared<sgl::Texture>(size_);
 		Frame frame{};
 		Render render{};
 
+		frame.BindTexture(*texture);
 		frame.BindAttach(render);
 		render.BindStorage(size_);
 
