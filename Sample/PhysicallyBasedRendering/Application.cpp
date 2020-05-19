@@ -229,7 +229,7 @@ std::shared_ptr<sgl::Texture> Application::CreateGaussianBlur(
 
 	bool horizontal = true;
 	bool beginning = true;
-	
+
 	for (int it = 0; it < 10; it++) {
 		sgl::TextureManager texture_manager;
 
