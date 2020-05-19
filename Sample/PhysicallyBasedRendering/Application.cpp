@@ -162,8 +162,9 @@ std::vector<std::string> Application::CreateTextures(
 std::shared_ptr<sgl::Texture> Application::AddBloom(
 	const std::shared_ptr<sgl::Texture>& texture) const
 {
-	return texture;
+	
 	auto brightness = CreateBrightness(texture);
+	return brightness;
 	auto gaussian_blur = CreateGaussianBlur(brightness);
 	auto merge = MergeDisplayAndGaussianBlur(texture, gaussian_blur);
 	return merge;
@@ -172,22 +173,28 @@ std::shared_ptr<sgl::Texture> Application::AddBloom(
 std::shared_ptr<sgl::Texture> Application::CreateBrightness(
 	const std::shared_ptr<sgl::Texture>& texture) const
 {
+	//You can get the size from the texture.
 	auto size = texture->GetSize();
-
+	//Initialize the frame and the render
 	sgl::Frame frame = sgl::Frame();
 	sgl::Render render = sgl::Render();
-
+	//Create a new texture
 	auto tex = std::make_shared<sgl::Texture>(size);
+	//Bind it
 	tex->Bind();
-
-	sgl::TextureManager texture_manager = sgl::TextureManager();
+	//A texture manager
+	sgl::TextureManager texture_manager{};
+	//Add the texture
 	texture_manager.AddTexture("Brightness", texture);
-
+	//Create the program
 	auto program = sgl::CreateProgram("Brightness");
+	//Create the quad
 	auto quad = CreateQuadMesh(program);
+	//Add the texture to the quad
 	quad->SetTextures({ "Brightness" });
+	//Draw
 	quad->Draw(texture_manager);
-
+	//Return the new texture
 	return tex;
 }
 
